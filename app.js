@@ -304,6 +304,14 @@ if (isHost) {
   }
 
   let dims = fitCanvas();
+  // keep canvas bitmap in sync whenever its CSS box changes (grid layout shifts
+  // after fonts/QR/images load, otherwise we end up drawing into a stretched bitmap)
+  if ("ResizeObserver" in window) {
+    new ResizeObserver(() => {
+      dims = fitCanvas();
+      rebuildWalls();
+    }).observe(canvas);
+  }
   let walls = [];
   function rebuildWalls() {
     walls.forEach(w => World.remove(world, w));
