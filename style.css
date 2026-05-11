@@ -1,0 +1,280 @@
+/* ===== gummi duck · lo-fi cute yellow ===== */
+
+:root {
+  --cream:   #FFF6D6;
+  --cream-2: #FFEFB0;
+  --yolk:    #FFD23F;
+  --mustard: #E9B23A;
+  --orange:  #F08A2A;
+  --cocoa:   #3D2A14;
+  --cocoa-2: #5A3F1F;
+  --ink:     #2A1B08;
+  --shadow:  rgba(61, 42, 20, 0.18);
+
+  /* the source image has a header banner with the question text on top.
+     these crop the 3x3 grid out of ducks.png. tweak if your screenshot ratio differs. */
+  --grid-top: 17%;    /* % from top where the 3x3 grid begins */
+  --grid-bot: 2%;     /* % from bottom to trim */
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'Patrick Hand', 'Shantell Sans', system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* soft paper grain over everything */
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.24  0 0 0 0 0.16  0 0 0 0 0.06  0 0 0 0.18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* gentle vignette */
+body::after {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(120, 80, 20, 0.18) 100%);
+}
+
+.view { padding: 18px 16px 36px; max-width: 720px; margin: 0 auto; }
+.view[hidden] { display: none; }
+
+/* ===== headers ===== */
+.hdr, .host-hdr { text-align: center; margin-bottom: 18px; }
+.hdr h1, .host-hdr h1 {
+  font-family: 'Shantell Sans', cursive;
+  font-weight: 700;
+  font-size: clamp(28px, 7vw, 42px);
+  line-height: 1.05;
+  margin: 8px 0 4px;
+  color: var(--cocoa);
+  letter-spacing: -0.5px;
+  transform: rotate(-1.2deg);
+  text-shadow: 2px 2px 0 var(--yolk);
+}
+.host-hdr h1 {
+  font-size: clamp(34px, 4.5vw, 56px);
+  transform: rotate(-0.6deg);
+}
+.sub {
+  font-size: 18px;
+  color: var(--cocoa-2);
+  margin: 0;
+  opacity: 0.85;
+}
+
+/* ===== participant grid ===== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 12px auto 24px;
+}
+
+.duck-btn {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border: 3px solid var(--cocoa);
+  border-radius: 22px;
+  background: var(--cream-2);
+  cursor: pointer;
+  overflow: hidden;
+  padding: 0;
+  box-shadow: 4px 5px 0 var(--shadow), inset 0 -3px 0 rgba(0,0,0,0.05);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  font-family: inherit;
+}
+.duck-btn:nth-child(odd)  { transform: rotate(-1.4deg); }
+.duck-btn:nth-child(even) { transform: rotate(1.4deg);  }
+.duck-btn:active {
+  transform: translateY(2px) rotate(0deg) scale(0.97);
+  box-shadow: 1px 2px 0 var(--shadow);
+}
+.duck-btn.voted {
+  animation: pop 420ms ease;
+  background: var(--yolk);
+}
+@keyframes pop {
+  0%   { transform: scale(1) rotate(0deg); }
+  35%  { transform: scale(1.12) rotate(-3deg); }
+  70%  { transform: scale(0.96) rotate(2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.duck-btn .crop {
+  position: absolute;
+  inset: 0;
+  background-image: url("./ducks.png");
+  background-repeat: no-repeat;
+  /* size & position computed by JS via custom props */
+  background-size: var(--bg-size);
+  background-position: var(--bg-pos);
+}
+
+.duck-btn .num {
+  position: absolute;
+  top: 6px; left: 8px;
+  font-family: 'Shantell Sans', cursive;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--ink);
+  background: var(--cream);
+  border: 2px solid var(--cocoa);
+  border-radius: 50%;
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  box-shadow: 1px 1px 0 var(--cocoa);
+}
+
+.duck-btn .label {
+  position: absolute;
+  bottom: 4px; left: 6px; right: 6px;
+  font-size: 13px;
+  color: var(--ink);
+  background: rgba(255, 246, 214, 0.86);
+  border-radius: 8px;
+  padding: 2px 6px;
+  line-height: 1.1;
+  text-align: center;
+}
+
+/* ===== status pill ===== */
+.footer-note {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 15px;
+  color: var(--cocoa-2);
+}
+.dot {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #d0a04a;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.dot.live   { background: #3aa84a; box-shadow: 0 0 0 4px rgba(58,168,74,0.18); }
+.dot.local  { background: var(--orange); }
+.dot.error  { background: #c84a3a; }
+
+/* ===== host stage ===== */
+.stage {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+#pond {
+  display: block;
+  width: 100%;
+  height: min(70vh, 720px);
+  background:
+    radial-gradient(ellipse at 50% 35%, #FFF8DE 0%, #FFE89A 55%, #F8C84A 100%);
+  border: 4px solid var(--cocoa);
+  border-radius: 36px;
+  box-shadow: 8px 10px 0 var(--shadow);
+}
+
+.qr-card {
+  position: absolute;
+  top: 18px; right: 18px;
+  background: var(--cream);
+  border: 3px solid var(--cocoa);
+  border-radius: 20px;
+  padding: 12px 14px;
+  box-shadow: 4px 5px 0 var(--shadow);
+  transform: rotate(2deg);
+  text-align: center;
+  max-width: 220px;
+}
+.qr-card #qr canvas, .qr-card #qr img {
+  width: 160px !important; height: 160px !important;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+}
+.qr-label {
+  margin: 8px 0 0;
+  font-size: 16px;
+  color: var(--cocoa);
+  line-height: 1.15;
+}
+.qr-label span {
+  display: block;
+  font-size: 12px;
+  color: var(--cocoa-2);
+  word-break: break-all;
+  margin-top: 4px;
+}
+
+.ghost-btn {
+  margin-top: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  background: var(--cream-2);
+  color: var(--cocoa);
+  border: 2px solid var(--cocoa);
+  border-radius: 10px;
+  padding: 4px 10px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--cocoa);
+}
+.ghost-btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--cocoa); }
+
+/* ===== legend ===== */
+.legend {
+  list-style: none;
+  padding: 0;
+  margin: 18px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px 18px;
+  max-width: 760px;
+  font-size: 16px;
+  color: var(--cocoa);
+}
+.legend li b {
+  display: inline-block;
+  width: 22px; height: 22px;
+  background: var(--yolk);
+  color: var(--ink);
+  border: 2px solid var(--cocoa);
+  border-radius: 50%;
+  font-size: 13px;
+  text-align: center;
+  line-height: 18px;
+  margin-right: 6px;
+}
+
+/* ===== small screens ===== */
+@media (max-width: 520px) {
+  .grid { gap: 10px; }
+  .duck-btn { border-radius: 18px; border-width: 2.5px; }
+  .duck-btn .label { font-size: 12px; }
+  .duck-btn .num { width: 24px; height: 24px; font-size: 16px; }
+}
+
+/* host on small screens: stack qr below pond */
+@media (max-width: 760px) {
+  .qr-card {
+    position: static;
+    margin: 14px auto 0;
+    transform: rotate(-1deg);
+  }
+  #pond { height: 60vh; }
+  .legend { grid-template-columns: repeat(2, 1fr); font-size: 14px; }
+}

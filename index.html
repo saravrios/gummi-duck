@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>which gummi duck are you?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Shantell+Sans:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+<!-- ============== PARTICIPANT (mobile voter) VIEW ============== -->
+<main id="voter" class="view">
+  <header class="hdr">
+    <h1>which gummi duck<br/>are you today?</h1>
+    <p class="sub">tap your vibe.</p>
+  </header>
+
+  <section class="grid" id="grid">
+    <!-- 9 buttons injected by JS, each a crop of ducks.png -->
+  </section>
+
+  <p class="footer-note">
+    <span id="status-dot" class="dot"></span>
+    <span id="status-text">connecting…</span>
+  </p>
+</main>
+
+<!-- ============== HOST (presentation) VIEW ============== -->
+<main id="host" class="view" hidden>
+  <header class="host-hdr">
+    <h1>which gummi duck are you?</h1>
+    <p class="sub">scan to vote · ducks grow with every tap</p>
+  </header>
+
+  <div class="stage">
+    <canvas id="pond"></canvas>
+
+    <aside class="qr-card">
+      <div id="qr"></div>
+      <p class="qr-label">scan me<br/><span id="qr-url"></span></p>
+      <button id="reset-btn" class="ghost-btn">reset pond</button>
+    </aside>
+  </div>
+
+  <ol class="legend">
+    <li><b>1</b> the main character</li>
+    <li><b>2</b> the "i'm fine" duck</li>
+    <li><b>3</b> the 3pm slump</li>
+    <li><b>4</b> the leaner</li>
+    <li><b>5</b> the full collapse</li>
+    <li><b>6</b> the horizontal specialist</li>
+    <li><b>7</b> the faceplanter</li>
+    <li><b>8</b> the round unit</li>
+    <li><b>9</b> the submariner</li>
+  </ol>
+</main>
+
+<!-- libs -->
+<script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+<!-- firebase (compat build – simple, no bundler) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script src="./firebase-config.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
