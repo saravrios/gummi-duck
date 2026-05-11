@@ -312,7 +312,8 @@ body::before {
 
 /* ===== host stage ===== */
 .stage {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 240px;
   align-items: stretch;
   gap: 18px;
   width: 100%;
@@ -321,9 +322,10 @@ body::before {
 
 #pond {
   display: block;
-  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 520px;
   min-width: 0;
-  height: min(72vh, 780px);
   /* pond water gradient (canvas paints over this, but border/edges show through) */
   background:
     radial-gradient(ellipse at 50% 35%, var(--pond-1) 0%, var(--pond-2) 55%, var(--pond-3) 100%);
@@ -337,7 +339,6 @@ body::before {
 }
 
 .side-panel {
-  flex: 0 0 240px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -459,11 +460,11 @@ body::before {
 }
 
 @media (max-width: 900px) {
-  .stage { flex-direction: column; }
-  .side-panel { flex: 0 0 auto; flex-direction: row; flex-wrap: wrap; }
+  .stage { grid-template-columns: 1fr; }
+  .side-panel { flex-direction: row; flex-wrap: wrap; }
   .qr-card { flex: 1 1 220px; }
   .legend { flex: 1 1 220px; }
-  #pond { height: 56vh; }
+  #pond { height: 56vh; min-height: 0; }
   .host-hdr h1 { font-size: clamp(32px, 8vw, 56px); }
 }
 @media (max-width: 520px) {
