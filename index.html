@@ -6,56 +6,74 @@
 <title>which gummi duck are you?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Shantell+Sans:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jersey+25&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
 
 <!-- ============== PARTICIPANT (mobile voter) VIEW ============== -->
 <main id="voter" class="view">
-  <header class="hdr">
-    <h1>which gummi duck<br/>are you today?</h1>
-    <p class="sub">tap your vibe.</p>
-  </header>
+  <div class="window">
+    <div class="window-bar">
+      <span class="tl tl-r"></span>
+      <span class="tl tl-y"></span>
+      <span class="tl tl-g"></span>
+      <span class="window-title">gummi_duck.app</span>
+    </div>
+    <div class="window-body">
+      <header class="hdr">
+        <h1>Which Gummi<br/>Duck Are You?</h1>
+        <p class="sub">&gt; tap your vibe.</p>
+      </header>
 
-  <section class="grid" id="grid">
-    <!-- 9 buttons injected by JS, each a crop of ducks.png -->
-  </section>
+      <section class="grid" id="grid"><!-- buttons injected by JS --></section>
 
-  <p class="footer-note">
-    <span id="status-dot" class="dot"></span>
-    <span id="status-text">connecting…</span>
-  </p>
+      <p class="footer-note">
+        <span id="status-dot" class="dot"></span>
+        <span id="status-text">connecting…</span>
+      </p>
+    </div>
+  </div>
 </main>
 
 <!-- ============== HOST (presentation) VIEW ============== -->
 <main id="host" class="view" hidden>
-  <header class="host-hdr">
-    <h1>which gummi duck are you?</h1>
-    <p class="sub">scan to vote · ducks grow with every tap</p>
-  </header>
+  <div class="window window--wide">
+    <div class="window-bar">
+      <span class="tl tl-r"></span>
+      <span class="tl tl-y"></span>
+      <span class="tl tl-g"></span>
+      <span class="window-title">gummi_duck.app — the pond</span>
+    </div>
+    <div class="window-body">
+      <header class="host-hdr">
+        <h1>Which Gummi Duck Are You?</h1>
+        <p class="sub">&gt; scan to vote &nbsp;·&nbsp; ducks grow with every tap</p>
+      </header>
 
-  <div class="stage">
-    <canvas id="pond"></canvas>
+      <div class="stage">
+        <canvas id="pond"></canvas>
 
-    <aside class="qr-card">
-      <div id="qr"></div>
-      <p class="qr-label">scan me<br/><span id="qr-url"></span></p>
-      <button id="reset-btn" class="ghost-btn">reset pond</button>
-    </aside>
+        <aside class="qr-card">
+          <div id="qr"></div>
+          <p class="qr-label">scan me<br/><span id="qr-url"></span></p>
+          <button id="reset-btn" class="ghost-btn">reset pond</button>
+        </aside>
+      </div>
+
+      <ol class="legend">
+        <li><b>1</b> the main character</li>
+        <li><b>2</b> the "i'm fine" duck</li>
+        <li><b>3</b> the 3pm slump</li>
+        <li><b>4</b> the leaner</li>
+        <li><b>5</b> the full collapse</li>
+        <li><b>6</b> the horizontal specialist</li>
+        <li><b>7</b> the faceplanter</li>
+        <li><b>8</b> the round unit</li>
+        <li><b>9</b> the submariner</li>
+      </ol>
+    </div>
   </div>
-
-  <ol class="legend">
-    <li><b>1</b> the main character</li>
-    <li><b>2</b> the "i'm fine" duck</li>
-    <li><b>3</b> the 3pm slump</li>
-    <li><b>4</b> the leaner</li>
-    <li><b>5</b> the full collapse</li>
-    <li><b>6</b> the horizontal specialist</li>
-    <li><b>7</b> the faceplanter</li>
-    <li><b>8</b> the round unit</li>
-    <li><b>9</b> the submariner</li>
-  </ol>
 </main>
 
 <!-- libs -->
