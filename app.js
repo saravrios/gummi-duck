@@ -218,24 +218,34 @@ if (isHost) {
     const sw = cellW * sprite.naturalWidth;
     const sh = cellH * sprite.naturalHeight;
 
-    // draw onto a circular masked canvas
-    const side = Math.min(sw, sh);
+    // size the offscreen canvas to the cell's longest side so we keep resolution,
+    // then draw the WHOLE cell centered inside a circle (fit-contain, no clipping).
+    const side = Math.max(sw, sh);
     const off = document.createElement("canvas");
     off.width = off.height = side;
     const octx = off.getContext("2d");
+
+    // pond-water fill behind the duck so transparent letterbox blends in
     octx.save();
     octx.beginPath();
     octx.arc(side/2, side/2, side/2, 0, Math.PI*2);
     octx.closePath();
+    octx.fillStyle = "#CDEAF6";
+    octx.fill();
     octx.clip();
-    // center-crop the cell into the square
-    const ox = (sw - side) / 2;
-    const oy = (sh - side) / 2;
-    octx.drawImage(sprite, sx + ox, sy + oy, side, side, 0, 0, side, side);
+
+    // fit-contain the cell into a square, centered
+    const scale = side / Math.max(sw, sh);
+    const dw = sw * scale;
+    const dh = sh * scale;
+    const dx = (side - dw) / 2;
+    const dy = (side - dh) / 2;
+    octx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
     octx.restore();
-    // border
-    octx.lineWidth = side * 0.05;
-    octx.strokeStyle = "#3D2A14";
+
+    // crisp ink border
+    octx.lineWidth = Math.max(2, side * 0.05);
+    octx.strokeStyle = "#1A1304";
     octx.beginPath();
     octx.arc(side/2, side/2, side/2 - octx.lineWidth/2, 0, Math.PI*2);
     octx.stroke();

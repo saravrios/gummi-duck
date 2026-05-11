@@ -284,15 +284,18 @@ body::before {
 
 /* ===== host stage ===== */
 .stage {
-  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 18px;
   width: 100%;
   margin: 0 auto;
 }
 
 #pond {
   display: block;
-  width: 100%;
-  height: min(68vh, 740px);
+  flex: 1 1 auto;
+  min-width: 0;
+  height: min(72vh, 780px);
   /* pond water gradient (canvas paints over this, but border/edges show through) */
   background:
     radial-gradient(ellipse at 50% 35%, var(--pond-1) 0%, var(--pond-2) 55%, var(--pond-3) 100%);
@@ -305,13 +308,17 @@ body::before {
   image-rendering: pixelated;
 }
 
+.side-panel {
+  flex: 0 0 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 .qr-card {
-  position: absolute;
-  top: 18px; right: 18px;
   background: var(--gold-1);
   padding: 14px 14px 12px;
   text-align: center;
-  max-width: 230px;
   box-shadow:
     0 -4px 0 0 var(--ink),
     0  4px 0 0 var(--ink),
@@ -372,18 +379,25 @@ body::before {
     1px 1px 0 0 var(--shadow);
 }
 
-/* ===== legend ===== */
+/* ===== legend (now in sidebar) ===== */
 .legend {
   list-style: none;
-  padding: 0;
-  margin: 24px auto 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px 18px;
+  padding: 12px 14px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   font-family: 'VT323', monospace;
-  font-size: 20px;
+  font-size: 18px;
   color: var(--ink);
   letter-spacing: 0.5px;
+  background: var(--gold-1);
+  box-shadow:
+    0 -4px 0 0 var(--ink),
+    0  4px 0 0 var(--ink),
+    -4px 0 0 0 var(--ink),
+    4px 0 0 0 var(--ink),
+    6px 6px 0 0 var(--shadow);
 }
 .legend li {
   display: flex;
@@ -413,9 +427,14 @@ body::before {
   .window-body { padding: 16px 14px 20px; }
 }
 
-@media (max-width: 760px) {
-  .qr-card { position: static; margin: 16px auto 0; }
+@media (max-width: 900px) {
+  .stage { flex-direction: column; }
+  .side-panel { flex: 0 0 auto; flex-direction: row; flex-wrap: wrap; }
+  .qr-card { flex: 1 1 220px; }
+  .legend { flex: 1 1 220px; }
   #pond { height: 56vh; }
-  .legend { grid-template-columns: repeat(2, 1fr); font-size: 18px; }
   .host-hdr h1 { font-size: clamp(32px, 8vw, 56px); }
+}
+@media (max-width: 520px) {
+  .side-panel { flex-direction: column; }
 }
