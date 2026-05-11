@@ -34,11 +34,34 @@ document.getElementById("host").hidden  = !isHost;
 function duckUrl(id) { return `./duck-${id}.png`; }
 
 /* ---------------------------------------------------------- sync layer */
-/* Two implementations behind a tiny interface:
-     sync.onVotes(cb)   -> cb({1: n, 2: n, ...}) any time totals change
-     sync.vote(duckId)  -> increments that duck's count
-     sync.reset()       -> zero everything
+/* One vote per voter, switchable. Each voter has a stable id stored in
+   localStorage and writes their chosen duck id to `voters/<voterId>`.
+   Totals are derived by counting voters per duck.
+
+   sync.onVotes(cb)         -> cb({1: n, 2: n, ...}) any time totals change
+   sync.vote(duckId)        -> sets THIS voter's pick (replaces previous)
+   sync.reset()             -> clears all voters
 */
+
+function getVoterId() {
+  let id = localStorage.getItem("gummi-duck-voter");
+  if (!id) {
+    id = "v_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+    localStorage.setItem("gummi-duck-voter", id);
+  }
+  return id;
+}
+const VOTER_ID = getVoterId();
+
+function tallyFromVoters(voters) {
+  const counts = {};
+  if (!voters) return counts;
+  Object.values(voters).forEach(duckId => {
+    const k = String(duckId);
+    counts[k] = (counts[k] || 0) + 1;
+  });
+  return counts;
+}
 
 function makeFirebaseSync() {
   const cfg = window.FIREBASE_CONFIG || {};
@@ -50,13 +73,16 @@ function makeFirebaseSync() {
     return {
       kind: "firebase",
       onVotes(cb) {
-        root.child("votes").on("value", snap => cb(snap.val() || {}));
+        root.child("voters").on("value", snap => cb(tallyFromVoters(snap.val())));
+      },
+      onMyVote(cb) {
+        root.child("voters/" + VOTER_ID).on("value", snap => cb(snap.val()));
       },
       vote(id) {
-        root.child("votes/" + id).transaction(v => (v || 0) + 1);
+        root.child("voters/" + VOTER_ID).set(id);
       },
       reset() {
-        root.child("votes").set({});
+        root.child("voters").set(null);
       },
     };
   } catch (err) {
@@ -66,22 +92,29 @@ function makeFirebaseSync() {
 }
 
 function makeLocalSync() {
-  const KEY = "gummi-duck-votes";
+  const KEY = "gummi-duck-voters";
   const ch  = ("BroadcastChannel" in window) ? new BroadcastChannel("gummi-duck") : null;
   const read  = () => JSON.parse(localStorage.getItem(KEY) || "{}");
   const write = v  => localStorage.setItem(KEY, JSON.stringify(v));
-  const listeners = [];
-  const emit = () => { const v = read(); listeners.forEach(fn => fn(v)); };
+  const voteListeners = [];
+  const myListeners   = [];
+  const emit = () => {
+    const voters = read();
+    const counts = tallyFromVoters(voters);
+    voteListeners.forEach(fn => fn(counts));
+    myListeners.forEach(fn => fn(voters[VOTER_ID] ?? null));
+  };
 
   if (ch) ch.onmessage = emit;
   window.addEventListener("storage", emit);
 
   return {
     kind: "local",
-    onVotes(cb) { listeners.push(cb); cb(read()); },
+    onVotes(cb)  { voteListeners.push(cb); cb(tallyFromVoters(read())); },
+    onMyVote(cb) { myListeners.push(cb);   cb(read()[VOTER_ID] ?? null); },
     vote(id) {
       const v = read();
-      v[id] = (v[id] || 0) + 1;
+      v[VOTER_ID] = id;
       write(v);
       ch?.postMessage("update");
       emit();
@@ -121,12 +154,20 @@ if (!isHost) {
       <span class="num">${d.id}</span>
       <span class="label">${d.name}</span>
     `;
+    btn.dataset.duckId = d.id;
     btn.addEventListener("click", () => {
       sync.vote(d.id);
       btn.classList.remove("voted"); void btn.offsetWidth; btn.classList.add("voted");
       if (navigator.vibrate) navigator.vibrate(18);
     });
     grid.appendChild(btn);
+  });
+
+  // highlight the currently selected duck (updates live when the user changes pick)
+  sync.onMyVote(picked => {
+    document.querySelectorAll(".duck-btn").forEach(b => {
+      b.classList.toggle("selected", String(b.dataset.duckId) === String(picked));
+    });
   });
 }
 
