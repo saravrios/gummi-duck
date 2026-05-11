@@ -30,36 +30,8 @@ document.getElementById("host").hidden  = !isHost;
 /* The screenshot includes a title banner. We treat the 3x3 grid as occupying
    the area from --grid-top to (100% - --grid-bot) vertically, full width.    */
 
-function cropStyleFor(duckId) {
-  const row = Math.floor((duckId - 1) / 3);   // 0,1,2
-  const col = (duckId - 1) % 3;               // 0,1,2
-
-  const cssRoot = getComputedStyle(document.documentElement);
-  const gridTop = parseFloat(cssRoot.getPropertyValue("--grid-top"));
-  const gridBot = parseFloat(cssRoot.getPropertyValue("--grid-bot"));
-  const gridH   = 100 - gridTop - gridBot;    // % of source image that is the 3x3 grid
-  const cellH   = gridH / 3;
-  const cellW   = 100 / 3;
-
-  // bg-size: scale so that one cell == 100% of the button. button is square,
-  // so we want each cell (which is ~cellW% wide × cellH% tall of source) to
-  // map to 100%×100% of the button. that means:
-  //   bg-width  = 100% / (cellW/100) = 100% * (100/cellW) = 300%
-  //   bg-height = 100% / (cellH/100)
-  const bgW = 100 / (cellW / 100);
-  const bgH = 100 / (cellH / 100);
-
-  // bg-position uses the "percentage of the *leftover* space" model, so:
-  //   posX = (col * cellW) / (100 - cellW) * 100%
-  //   posY = ((gridTop + row*cellH)) / (100 - cellH) * 100%
-  const posX = (col * cellW) / (100 - cellW) * 100;
-  const posY = (gridTop + row * cellH) / (100 - cellH) * 100;
-
-  return {
-    size: `${bgW}% ${bgH}%`,
-    pos:  `${posX}% ${posY}%`,
-  };
-}
+// Per-duck PNGs (transparent, pre-trimmed to the duck itself) are at ./duck-1.png … ./duck-9.png
+function duckUrl(id) { return `./duck-${id}.png`; }
 
 /* ---------------------------------------------------------- sync layer */
 /* Two implementations behind a tiny interface:
@@ -141,12 +113,11 @@ if (sDot && sText) {
 if (!isHost) {
   const grid = document.getElementById("grid");
   DUCKS.forEach(d => {
-    const { size, pos } = cropStyleFor(d.id);
     const btn = document.createElement("button");
     btn.className = "duck-btn";
     btn.setAttribute("aria-label", `vote ${d.name}`);
     btn.innerHTML = `
-      <span class="crop" style="--bg-size:${size}; --bg-pos:${pos};"></span>
+      <span class="crop" style="background-image:url('${duckUrl(d.id)}');"></span>
       <span class="num">${d.id}</span>
       <span class="label">${d.name}</span>
     `;
@@ -196,29 +167,20 @@ if (isHost) {
   const canvas = document.getElementById("pond");
   const ctx    = canvas.getContext("2d");
 
-  // preload the duck sprite once, then keep a per-duck cached canvas crop
-  const sprite = new Image();
-  sprite.src = "./ducks.png";
+  // preload 9 per-duck PNGs (already tight-cropped + transparent bg)
+  const duckImgs = {};
+  DUCKS.forEach(d => {
+    const im = new Image();
+    im.src = duckUrl(d.id);
+    duckImgs[d.id] = im;
+  });
 
   const cropCache = {};   // id -> low-res offscreen canvas (scaled up = pixelated)
   const PIXEL_SIDE = 56;  // small = chunky pixels when blown up on the pond
   function getCrop(id) {
     if (cropCache[id]) return cropCache[id];
-    if (!sprite.complete || !sprite.naturalWidth) return null;
-    const cssRoot = getComputedStyle(document.documentElement);
-    const gridTop = parseFloat(cssRoot.getPropertyValue("--grid-top")) / 100;
-    const gridBot = parseFloat(cssRoot.getPropertyValue("--grid-bot")) / 100;
-    const gH = 1 - gridTop - gridBot;
-    const cellH = gH / 3;
-    const cellW = 1 / 3;
-
-    const row = Math.floor((id - 1) / 3);
-    const col = (id - 1) % 3;
-
-    const sx = col * cellW * sprite.naturalWidth;
-    const sy = (gridTop + row * cellH) * sprite.naturalHeight;
-    const sw = cellW * sprite.naturalWidth;
-    const sh = cellH * sprite.naturalHeight;
+    const img = duckImgs[id];
+    if (!img || !img.complete || !img.naturalWidth) return null;
 
     const side = PIXEL_SIDE;
     const off = document.createElement("canvas");
@@ -226,7 +188,7 @@ if (isHost) {
     const octx = off.getContext("2d");
     octx.imageSmoothingEnabled = false;
 
-    // pond-water fill behind the duck inside the circle mask
+    // circle mask filled with pond water → letterbox blends into the pond
     octx.save();
     octx.beginPath();
     octx.arc(side/2, side/2, side/2, 0, Math.PI*2);
@@ -235,18 +197,14 @@ if (isHost) {
     octx.fill();
     octx.clip();
 
-    // fit-contain the cell into the small square, centered → chunky pixels when scaled up
-    const scale = side / Math.max(sw, sh);
-    const dw = sw * scale;
-    const dh = sh * scale;
-    const dx = (side - dw) / 2;
-    const dy = (side - dh) / 2;
-    octx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
+    // fit-contain the duck PNG (already square w/ transparent padding) into the circle
+    const s = img.naturalWidth;
+    octx.drawImage(img, 0, 0, s, s, 0, 0, side, side);
     octx.restore();
 
-    // pixel-stepped border: a ring of small squares along the circle edge
+    // pixel-stepped border ring
     const r = side / 2;
-    const borderPx = 2;       // thickness of the border in "pixels"
+    const borderPx = 2;
     octx.fillStyle = "#1A1304";
     for (let y = 0; y < side; y++) {
       for (let x = 0; x < side; x++) {
@@ -258,7 +216,6 @@ if (isHost) {
         }
       }
     }
-
     cropCache[id] = off;
     return off;
   }
