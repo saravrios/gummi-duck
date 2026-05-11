@@ -17,6 +17,12 @@
   --win-bar-2: #C8C8C8;
   --win-body:  #FBFBFB;
 
+  /* pond water */
+  --pond-1: #CDEAF6; /* surface highlight */
+  --pond-2: #8FCEE6; /* mid water */
+  --pond-3: #5FAFD0; /* deep water */
+  --pond-4: #3B8AB0; /* deepest accent */
+
   --grid-top: 17%;
   --grid-bot: 2%;
 }
@@ -128,10 +134,10 @@ body::before {
 .hdr, .host-hdr { text-align: center; margin: 6px 0 22px; }
 
 .hdr h1, .host-hdr h1 {
-  font-family: 'Pixelify Sans', 'Press Start 2P', monospace;
-  font-weight: 700;
-  font-size: clamp(40px, 11vw, 72px);
-  line-height: 0.9;
+  font-family: 'VT323', 'Press Start 2P', monospace;
+  font-weight: 400;
+  font-size: clamp(54px, 14vw, 96px);
+  line-height: 0.95;
   margin: 12px 0 12px;
   color: var(--ink);
   letter-spacing: 1px;
@@ -139,7 +145,7 @@ body::before {
   text-shadow: 3px 3px 0 var(--gold-5);
 }
 .host-hdr h1 {
-  font-size: clamp(48px, 6vw, 88px);
+  font-size: clamp(64px, 8vw, 116px);
 }
 .sub {
   font-family: 'VT323', monospace;
@@ -278,7 +284,9 @@ body::before {
   display: block;
   width: 100%;
   height: min(68vh, 740px);
-  background: var(--gold-2);
+  /* pond water gradient (canvas paints over this, but border/edges show through) */
+  background:
+    radial-gradient(ellipse at 50% 35%, var(--pond-1) 0%, var(--pond-2) 55%, var(--pond-3) 100%);
   box-shadow:
     0 -6px 0 0 var(--ink),
     0  6px 0 0 var(--ink),

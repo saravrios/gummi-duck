@@ -313,18 +313,44 @@ if (isHost) {
 
   // render loop
   function draw() {
-    ctx.clearRect(0, 0, dims.w, dims.h);
+    // -- pond water background painted in canvas so we can dither it
+    const grad = ctx.createRadialGradient(
+      dims.w/2, dims.h*0.35, Math.min(dims.w,dims.h)*0.05,
+      dims.w/2, dims.h*0.55, Math.max(dims.w,dims.h)*0.7
+    );
+    grad.addColorStop(0,    "#CDEAF6");
+    grad.addColorStop(0.55, "#8FCEE6");
+    grad.addColorStop(1,    "#5FAFD0");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, dims.w, dims.h);
 
-    // soft pond ripples
+    // 2-px pixel stipple dither over the water for retro feel
+    ctx.fillStyle = "rgba(205, 234, 246, 0.55)";
+    const step = 4;
+    for (let y = 0; y < dims.h; y += step) {
+      for (let x = ((y / step) % 2) * 2; x < dims.w; x += step) {
+        ctx.fillRect(x, y, 2, 2);
+      }
+    }
+
+    // expanding pond ripples
     const t = performance.now() / 1000;
     for (let i = 0; i < 4; i++) {
       ctx.beginPath();
-      const rad = 60 + i * 80 + Math.sin(t + i) * 8;
-      ctx.arc(dims.w/2, dims.h/2, rad, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(233, 178, 58, ${0.12 - i*0.025})`;
-      ctx.lineWidth = 6;
+      const rad = 60 + i * 100 + ((t * 18 + i * 30) % 90);
+      ctx.arc(dims.w/2, dims.h*0.55, rad, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255, 255, 255, ${0.22 - i*0.05})`;
+      ctx.lineWidth = 3;
       ctx.stroke();
     }
+    // a couple of static "lily pad" highlights for charm
+    ctx.fillStyle = "rgba(255,255,255,0.18)";
+    ctx.beginPath();
+    ctx.ellipse(dims.w*0.18, dims.h*0.78, 60, 14, -0.25, 0, Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(dims.w*0.82, dims.h*0.22, 70, 16, 0.18, 0, Math.PI*2);
+    ctx.fill();
 
     // find current leader (most votes); ties → no crown
     let leaderId = null, leaderV = 0, tie = false;
