@@ -409,15 +409,6 @@ if (isHost) {
     ctx.ellipse(dims.w*0.84, dims.h*0.20, 70, 14, 0.18, 0, Math.PI*2);
     ctx.fill();
 
-    // find current leader (most votes); ties → no crown
-    let leaderId = null, leaderV = 0, tie = false;
-    Object.values(bubbles).forEach(b => {
-      const v = b.votes ?? 0;
-      if (v > leaderV) { leaderV = v; leaderId = b.duckId; tie = false; }
-      else if (v === leaderV && v > 0 && b.duckId !== leaderId) { tie = true; }
-    });
-    if (tie || leaderV === 0) leaderId = null;
-
     // keep image-smoothing off so duck circles stay pixelated when scaled
     ctx.imageSmoothingEnabled = false;
 
