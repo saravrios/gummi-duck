@@ -79,7 +79,28 @@ body::before {
   max-width: 760px;
   margin: 0 auto;
 }
-#host.view { max-width: 1700px; }
+#host.view {
+  max-width: 1700px;
+  height: 100vh;
+  padding: 14px 14px 14px;
+  display: flex;
+  flex-direction: column;
+}
+#host .window--wide {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+#host .window-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 18px 18px;
+}
+#host .host-hdr { flex: 0 0 auto; margin: 2px 0 8px; }
+#host .stage { flex: 1 1 auto; min-height: 0; }
 .view[hidden] { display: none; }
 
 .window {
@@ -240,10 +261,9 @@ body::before {
 .duck-btn .crop {
   position: absolute;
   inset: 4px;
-  background-image: url("./ducks.png");
   background-repeat: no-repeat;
-  background-size: var(--bg-size);
-  background-position: var(--bg-pos);
+  background-size: contain;
+  background-position: center;
   image-rendering: pixelated;
   filter: saturate(1.1) contrast(1.05);
 }
@@ -324,7 +344,7 @@ body::before {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: 520px;
+  min-height: 0;
   min-width: 0;
   /* pond water gradient (canvas paints over this, but border/edges show through) */
   background:
@@ -349,7 +369,7 @@ body::before {
 
 .qr-card {
   background: var(--gold-1);
-  padding: 14px 14px 12px;
+  padding: 10px 12px 10px;
   text-align: center;
   box-shadow:
     0 -4px 0 0 var(--ink),
@@ -359,7 +379,7 @@ body::before {
     6px 6px 0 0 var(--shadow);
 }
 .qr-card #qr canvas, .qr-card #qr img {
-  width: 170px !important; height: 170px !important;
+  width: 140px !important; height: 140px !important;
   display: block;
   margin: 0 auto;
   image-rendering: pixelated;
@@ -414,13 +434,13 @@ body::before {
 /* ===== legend (now in sidebar) ===== */
 .legend {
   list-style: none;
-  padding: 12px 14px;
+  padding: 10px 12px;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 3px;
   font-family: 'VT323', monospace;
-  font-size: 18px;
+  font-size: 16px;
   color: var(--ink);
   letter-spacing: 0.5px;
   background: var(--gold-1);
@@ -438,11 +458,11 @@ body::before {
 }
 .legend li b {
   display: inline-grid; place-items: center;
-  width: 26px; height: 26px;
+  width: 22px; height: 22px;
   background: var(--gold-5);
   color: var(--ink);
   font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
+  font-size: 9px;
   flex-shrink: 0;
   box-shadow:
     0 -2px 0 0 var(--ink),

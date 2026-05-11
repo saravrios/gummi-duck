@@ -190,8 +190,8 @@ if (isHost) {
     }
     new QRCode(host, {
       text: voterUrl,
-      width: 160,
-      height: 160,
+      width: 140,
+      height: 140,
       colorDark:  "#3D2A14",
       colorLight: "#FFF6D6",
       correctLevel: QRCode.CorrectLevel.M,
