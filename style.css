@@ -421,7 +421,18 @@ body::before {
     2px 0 0 0 var(--ink),
     3px 3px 0 0 var(--shadow);
 }
+.ghost-btn:hover {
+  background: var(--gold-5);
+  transform: translate(-1px, -1px);
+  box-shadow:
+    0 -2px 0 0 var(--ink),
+    0  2px 0 0 var(--ink),
+    -2px 0 0 0 var(--ink),
+    2px 0 0 0 var(--ink),
+    5px 5px 0 0 var(--shadow);
+}
 .ghost-btn:active {
+  background: var(--gold-6);
   transform: translate(2px, 2px);
   box-shadow:
     0 -2px 0 0 var(--ink),
