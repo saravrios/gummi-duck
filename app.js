@@ -187,9 +187,10 @@ if (isHost) {
   }
   renderQR();
 
-  document.getElementById("reset-btn").onclick = () => {
-    if (confirm("reset all votes?")) sync.reset();
-  };
+  document.getElementById("reset-btn").addEventListener("click", (e) => {
+    e.preventDefault();
+    sync.reset();
+  });
 
   // -- physics pond --
   const canvas = document.getElementById("pond");
@@ -199,7 +200,8 @@ if (isHost) {
   const sprite = new Image();
   sprite.src = "./ducks.png";
 
-  const cropCache = {};   // id -> offscreen canvas with just that duck cell
+  const cropCache = {};   // id -> low-res offscreen canvas (scaled up = pixelated)
+  const PIXEL_SIDE = 56;  // small = chunky pixels when blown up on the pond
   function getCrop(id) {
     if (cropCache[id]) return cropCache[id];
     if (!sprite.complete || !sprite.naturalWidth) return null;
@@ -218,14 +220,13 @@ if (isHost) {
     const sw = cellW * sprite.naturalWidth;
     const sh = cellH * sprite.naturalHeight;
 
-    // size the offscreen canvas to the cell's longest side so we keep resolution,
-    // then draw the WHOLE cell centered inside a circle (fit-contain, no clipping).
-    const side = Math.max(sw, sh);
+    const side = PIXEL_SIDE;
     const off = document.createElement("canvas");
     off.width = off.height = side;
     const octx = off.getContext("2d");
+    octx.imageSmoothingEnabled = false;
 
-    // pond-water fill behind the duck so transparent letterbox blends in
+    // pond-water fill behind the duck inside the circle mask
     octx.save();
     octx.beginPath();
     octx.arc(side/2, side/2, side/2, 0, Math.PI*2);
@@ -234,7 +235,7 @@ if (isHost) {
     octx.fill();
     octx.clip();
 
-    // fit-contain the cell into a square, centered
+    // fit-contain the cell into the small square, centered → chunky pixels when scaled up
     const scale = side / Math.max(sw, sh);
     const dw = sw * scale;
     const dh = sh * scale;
@@ -243,12 +244,21 @@ if (isHost) {
     octx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
     octx.restore();
 
-    // crisp ink border
-    octx.lineWidth = Math.max(2, side * 0.05);
-    octx.strokeStyle = "#1A1304";
-    octx.beginPath();
-    octx.arc(side/2, side/2, side/2 - octx.lineWidth/2, 0, Math.PI*2);
-    octx.stroke();
+    // pixel-stepped border: a ring of small squares along the circle edge
+    const r = side / 2;
+    const borderPx = 2;       // thickness of the border in "pixels"
+    octx.fillStyle = "#1A1304";
+    for (let y = 0; y < side; y++) {
+      for (let x = 0; x < side; x++) {
+        const dx2 = x + 0.5 - r;
+        const dy2 = y + 0.5 - r;
+        const d = Math.sqrt(dx2*dx2 + dy2*dy2);
+        if (d <= r && d >= r - borderPx) {
+          octx.fillRect(x, y, 1, 1);
+        }
+      }
+    }
+
     cropCache[id] = off;
     return off;
   }
@@ -408,25 +418,12 @@ if (isHost) {
     });
     if (tie || leaderV === 0) leaderId = null;
 
+    // keep image-smoothing off so duck circles stay pixelated when scaled
+    ctx.imageSmoothingEnabled = false;
+
     Object.values(bubbles).forEach(b => {
       const img = getCrop(b.duckId);
       const r = b.currentR;
-      const isLeader = b.duckId === leaderId;
-
-      // leader glow halo behind the bubble
-      if (isLeader) {
-        const pulse = 1 + Math.sin(t * 3) * 0.08;
-        ctx.save();
-        ctx.translate(b.position.x, b.position.y);
-        const grad = ctx.createRadialGradient(0, 0, r * 0.7, 0, 0, r * 1.6 * pulse);
-        grad.addColorStop(0, "rgba(255, 210, 63, 0.55)");
-        grad.addColorStop(1, "rgba(255, 210, 63, 0)");
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(0, 0, r * 1.6 * pulse, 0, Math.PI*2);
-        ctx.fill();
-        ctx.restore();
-      }
 
       ctx.save();
       ctx.translate(b.position.x, b.position.y);
@@ -455,17 +452,6 @@ if (isHost) {
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
       ctx.fillText(b.votes ?? 0, 0, 1);
       ctx.restore();
-
-      // tiny crown above the leader
-      if (isLeader) {
-        ctx.save();
-        ctx.translate(b.position.x, b.position.y - r - 14);
-        ctx.font = `${Math.max(22, r * 0.55)}px serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("♛", 0, 0);
-        ctx.restore();
-      }
     });
 
     requestAnimationFrame(draw);
