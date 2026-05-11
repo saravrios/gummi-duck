@@ -333,23 +333,59 @@ if (isHost) {
       }
     }
 
-    // expanding pond ripples
     const t = performance.now() / 1000;
-    for (let i = 0; i < 4; i++) {
-      ctx.beginPath();
-      const rad = 60 + i * 100 + ((t * 18 + i * 30) % 90);
-      ctx.arc(dims.w/2, dims.h*0.55, rad, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(255, 255, 255, ${0.22 - i*0.05})`;
-      ctx.lineWidth = 3;
-      ctx.stroke();
+
+    // -- cute pixelated waves: little "~" sprites tiled across the pond,
+    //    drifting horizontally. two layers at different opacity/speed = parallax.
+    //
+    //  shape (each # is a 2x2 px block):
+    //      . . # # . . . . # # . .
+    //      # # . . # # # # . . # #
+    //
+    const P = 2;                  // pixel block size
+    const waveShape = [
+      [0,0,1,1,0,0,0,0,1,1,0,0],
+      [1,1,0,0,1,1,1,1,0,0,1,1],
+    ];
+    const waveW = waveShape[0].length * P;   // 24px
+    const waveH = waveShape.length    * P;   //  4px
+
+    function drawWaves(spacingX, spacingY, speed, alpha, color) {
+      ctx.fillStyle = color.replace("ALPHA", alpha);
+      const offset = (t * speed) % spacingX;
+      const rows = Math.ceil(dims.h / spacingY) + 1;
+      for (let row = 0; row < rows; row++) {
+        const y = row * spacingY;
+        const rowShift = (row % 2) * (spacingX / 2);  // brick offset per row
+        const cols = Math.ceil(dims.w / spacingX) + 2;
+        for (let col = -1; col < cols; col++) {
+          const x = col * spacingX + rowShift - offset;
+          for (let py = 0; py < waveShape.length; py++) {
+            for (let px = 0; px < waveShape[py].length; px++) {
+              if (waveShape[py][px]) {
+                ctx.fillRect(x + px * P, y + py * P, P, P);
+              }
+            }
+          }
+        }
+      }
     }
-    // a couple of static "lily pad" highlights for charm
-    ctx.fillStyle = "rgba(255,255,255,0.18)";
+
+    // back layer: bigger spacing, slower drift, lower opacity
+    drawWaves(80, 56,  8,  "0.18", "rgba(255,255,255,ALPHA)");
+    // front layer: tighter spacing, faster, brighter — slight vertical bob
+    ctx.save();
+    ctx.translate(0, Math.sin(t * 1.3) * 1);
+    drawWaves(64, 40, 14, "0.32", "rgba(255,255,255,ALPHA)");
+    ctx.restore();
+
+    // soft lily-pad highlights for charm
+    ctx.fillStyle = "rgba(255,255,255,0.16)";
     ctx.beginPath();
-    ctx.ellipse(dims.w*0.18, dims.h*0.78, 60, 14, -0.25, 0, Math.PI*2);
+    ctx.ellipse(dims.w*0.18, dims.h*0.82, 60, 12, -0.25, 0, Math.PI*2);
     ctx.fill();
     ctx.beginPath();
-    ctx.ellipse(dims.w*0.82, dims.h*0.22, 70, 16, 0.18, 0, Math.PI*2);
+    ctx.ellipse(dims.w*0.84, dims.h*0.20, 70, 14, 0.18, 0, Math.PI*2);
     ctx.fill();
 
     // find current leader (most votes); ties → no crown
