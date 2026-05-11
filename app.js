@@ -238,9 +238,15 @@ if (isHost) {
     octx.fill();
     octx.clip();
 
-    // fit-contain the duck PNG (already square w/ transparent padding) into the circle
-    const s = img.naturalWidth;
-    octx.drawImage(img, 0, 0, s, s, 0, 0, side, side);
+    // fit-contain the duck cell (which may be wider than tall) into the circle
+    const iw = img.naturalWidth;
+    const ih = img.naturalHeight;
+    const scale = Math.min(side / iw, side / ih);
+    const dw = iw * scale;
+    const dh = ih * scale;
+    const dx = (side - dw) / 2;
+    const dy = (side - dh) / 2;
+    octx.drawImage(img, 0, 0, iw, ih, dx, dy, dw, dh);
     octx.restore();
 
     // pixel-stepped border ring

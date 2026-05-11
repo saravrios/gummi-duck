@@ -262,7 +262,7 @@ body::before {
   position: absolute;
   inset: 4px;
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: cover;
   background-position: center;
   image-rendering: pixelated;
   filter: saturate(1.1) contrast(1.05);
