@@ -283,8 +283,9 @@ if (isHost) {
   rebuildWalls();
 
   // create one bubble per duck with a starting min radius
-  const MIN_R = 26;
-  const PX_PER_VOTE = 14;   // area-based growth: r = sqrt(MIN_R^2 + votes * PX_PER_VOTE^2)
+  // tuned for small groups (~6-7 voters): each vote noticeably bumps radius
+  const MIN_R = 22;
+  const GROWTH = 26;        // r = MIN_R + GROWTH * votes
   const bubbles = {};
   DUCKS.forEach((d, i) => {
     const angle = (i / DUCKS.length) * Math.PI * 2;
@@ -484,9 +485,9 @@ if (isHost) {
       if (!b) return;
       const prev = b.votes ?? 0;
       b.votes = v;
-      // area ∝ votes → r = sqrt(min^2 + v * PX_PER_VOTE^2), capped
-      const maxR = Math.min(dims.w, dims.h) * 0.22;
-      const r = Math.min(maxR, Math.sqrt(MIN_R*MIN_R + v * PX_PER_VOTE * PX_PER_VOTE));
+      // dramatic linear growth (each vote adds GROWTH px to radius), capped at ~30% of pond
+      const maxR = Math.min(dims.w, dims.h) * 0.30;
+      const r = Math.min(maxR, MIN_R + GROWTH * v);
       b.targetR = r;
       // little bounce when a new vote lands
       if (v > prev) {
