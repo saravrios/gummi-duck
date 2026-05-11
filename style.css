@@ -37,12 +37,12 @@ html, body {
   overflow-x: hidden;
   background: var(--gold-3);
   /* default cursor → duck (hotspot at duck's feet, center bottom) */
-  cursor: url("./duck-cursor.png") 24 46, auto;
+  cursor: url("./duck-cursor.png") 20 44, auto;
 }
 
 /* bigger duck on clickable things */
 a, button, .duck-btn, .ghost-btn, [role="button"] {
-  cursor: url("./duck-cursor-lg.png") 32 60, pointer;
+  cursor: url("./duck-cursor-lg.png") 26 60, pointer;
 }
 
 /* dithered golden gradient bg: deeper at top, fading to cream at bottom.
@@ -152,8 +152,10 @@ body::before {
   text-shadow: 3px 3px 0 var(--gold-5);
 }
 .host-hdr h1 {
-  font-size: clamp(64px, 8vw, 116px);
+  font-size: clamp(34px, 4vw, 56px);
+  margin: 4px 0 6px;
 }
+.host-hdr { margin: 2px 0 12px; }
 .sub {
   font-family: 'VT323', monospace;
   font-size: 22px;
