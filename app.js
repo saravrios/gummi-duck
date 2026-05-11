@@ -202,7 +202,22 @@ if (isHost) {
   document.getElementById("reset-btn").addEventListener("click", (e) => {
     e.preventDefault();
     sync.reset();
+    dropPoop(e.clientX, e.clientY);
   });
+
+  let lastMouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+  window.addEventListener("mousemove", e => { lastMouse.x = e.clientX; lastMouse.y = e.clientY; });
+
+  function dropPoop(x, y) {
+    if (x == null) { x = lastMouse.x; y = lastMouse.y; }
+    const el = document.createElement("div");
+    el.className = "poop-drop";
+    el.textContent = "💩";
+    el.style.left = x + "px";
+    el.style.top  = y + "px";
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1600);
+  }
 
   // -- physics pond --
   const canvas = document.getElementById("pond");
