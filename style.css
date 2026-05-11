@@ -40,9 +40,9 @@ html, body {
   cursor: url("./duck-cursor.png") 23 46, auto;
 }
 
-/* bigger duck on clickable things — hotspot well within image bounds so browsers don't drop the custom cursor */
+/* clickable things → normal hand pointer (custom cursor sometimes interferes with clicks) */
 a, button, .duck-btn, .ghost-btn, [role="button"] {
-  cursor: url("./duck-cursor-lg.png") 30 58, pointer;
+  cursor: pointer;
 }
 
 /* dithered golden gradient bg: deeper at top, fading to cream at bottom.
