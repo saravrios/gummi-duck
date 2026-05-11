@@ -40,9 +40,9 @@ html, body {
   cursor: url("./duck-cursor.png") 23 46, auto;
 }
 
-/* clickable things → normal hand pointer (custom cursor sometimes interferes with clicks) */
+/* keep the duck cursor on clickables too (with pointer as fallback) */
 a, button, .duck-btn, .ghost-btn, [role="button"] {
-  cursor: pointer;
+  cursor: url("./duck-cursor.png") 23 46, pointer;
 }
 
 /* dithered golden gradient bg: deeper at top, fading to cream at bottom.
@@ -77,11 +77,13 @@ body {
     2px 2px 0 var(--ink);
 }
 @keyframes poopfall {
-  0%   { transform: translate(-50%, -10px) scale(0.4) rotate(0deg);    opacity: 0; }
-  15%  { transform: translate(-50%,  0px)  scale(1.1) rotate(-12deg);  opacity: 1; }
-  30%  { transform: translate(-50%,  6px)  scale(1.0) rotate(10deg);   opacity: 1; }
-  70%  { transform: translate(-50%, 40px)  scale(1.0) rotate(-6deg);   opacity: 1; }
-  100% { transform: translate(-50%, 80px)  scale(0.95) rotate(8deg);   opacity: 0; }
+  /* poop emerges from the duck's underside (cursor hotspot is at duck's feet)
+     and plops down to the ground */
+  0%   { transform: translate(-50%, -4px) scale(0.3) rotate(0deg);    opacity: 0.9; }
+  18%  { transform: translate(-50%,  2px) scale(0.95) rotate(-8deg);  opacity: 1; }
+  40%  { transform: translate(-50%, 22px) scale(1.0)  rotate(12deg);  opacity: 1; }
+  70%  { transform: translate(-50%, 56px) scale(0.98) rotate(-4deg);  opacity: 1; }
+  100% { transform: translate(-50%, 90px) scale(0.92) rotate(6deg);   opacity: 0; }
 }
 
 /* CRT scanlines, very subtle */

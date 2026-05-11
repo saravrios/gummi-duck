@@ -210,13 +210,20 @@ if (isHost) {
 
   function dropPoop(x, y) {
     if (x == null) { x = lastMouse.x; y = lastMouse.y; }
-    const el = document.createElement("div");
-    el.className = "poop-drop";
-    el.textContent = "💩";
-    el.style.left = x + "px";
-    el.style.top  = y + "px";
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 1600);
+    // emit several poops in quick succession from under the duck cursor for extra drama
+    const N = 3;
+    for (let i = 0; i < N; i++) {
+      setTimeout(() => {
+        const el = document.createElement("div");
+        el.className = "poop-drop";
+        el.textContent = "💩";
+        // x slightly randomized so they don't stack perfectly; y starts AT the cursor hotspot (duck's feet/butt)
+        el.style.left = (x + (Math.random() - 0.5) * 10) + "px";
+        el.style.top  = y + "px";
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1600);
+      }, i * 90);
+    }
   }
 
   // -- physics pond --
