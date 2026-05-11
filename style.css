@@ -128,8 +128,8 @@ body::before {
 .hdr, .host-hdr { text-align: center; margin: 6px 0 22px; }
 
 .hdr h1, .host-hdr h1 {
-  font-family: 'Jersey 25', 'Press Start 2P', monospace;
-  font-weight: 400;
+  font-family: 'Pixelify Sans', 'Press Start 2P', monospace;
+  font-weight: 700;
   font-size: clamp(40px, 11vw, 72px);
   line-height: 0.9;
   margin: 12px 0 12px;
