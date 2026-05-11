@@ -40,9 +40,13 @@ html, body {
   cursor: url("./duck-cursor.png") 23 46, auto;
 }
 
-/* keep the duck cursor on clickables too (with pointer as fallback) */
-a, button, .duck-btn, .ghost-btn, [role="button"] {
-  cursor: url("./duck-cursor.png") 23 46, pointer;
+/* duck cursor stays the duck — even on clickables and during hover/active */
+a, a:hover, a:active,
+button, button:hover, button:active,
+.duck-btn, .duck-btn:hover, .duck-btn:active,
+.ghost-btn, .ghost-btn:hover, .ghost-btn:active,
+[role="button"] {
+  cursor: url("./duck-cursor.png") 23 46, auto;
 }
 
 /* dithered golden gradient bg: deeper at top, fading to cream at bottom.
