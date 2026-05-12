@@ -216,14 +216,19 @@ body::before {
   letter-spacing: 1px;
   min-height: 1.25em;     /* prevent layout jitter while typing */
 }
-.sub.typing::after {
+.sub.typing::after,
+.host-hdr h1.typing::after {
   content: "_";
   display: inline-block;
   animation: caret 0.7s steps(2) infinite;
   color: var(--ink);
-  margin-left: 2px;
+  margin-left: 4px;
 }
 @keyframes caret { 50% { opacity: 0; } }
+.host-hdr h1 {
+  min-height: 1.2em;       /* prevent jitter while typing */
+  word-break: break-word;
+}
 
 /* ===== participant grid ===== */
 .grid {

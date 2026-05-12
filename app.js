@@ -16,7 +16,7 @@ const DUCKS = [
   { id: 8, name: "the round unit",          mood: "the vibe today: peak physical performance" },
   { id: 9, name: "the submariner",          mood: "the vibe today: everyone's logged off mentally" },
 ];
-const MOOD_WAITING = "> scan to vote · ducks grow with every tap";
+const MOOD_DEFAULT = "Which Gummi Duck Are You?";
 const MOOD_TIE     = "the vibe today: the team is split. messy.";
 
 // Default URL = host (the public presentation page with QR + pond).
@@ -490,24 +490,24 @@ if (isHost) {
     rebuildWalls();
   });
 
-  // typewriter for the mood subtitle
-  const subEl = document.querySelector("#host .host-hdr .sub");
-  let typeTimer = null, currentMood = MOOD_WAITING;
-  subEl.textContent = currentMood;
+  // typewriter for the big title (becomes the live mood line)
+  const titleEl = document.getElementById("vibe-title");
+  let typeTimer = null, currentMood = MOOD_DEFAULT;
+  titleEl.textContent = currentMood;
   function setMood(text) {
     if (text === currentMood) return;
     currentMood = text;
     clearInterval(typeTimer);
-    subEl.classList.add("typing");
-    subEl.textContent = "";
+    titleEl.classList.add("typing");
+    titleEl.textContent = "";
     let i = 0;
     typeTimer = setInterval(() => {
-      subEl.textContent = text.slice(0, ++i);
+      titleEl.textContent = text.slice(0, ++i);
       if (i >= text.length) {
         clearInterval(typeTimer);
-        subEl.classList.remove("typing");
+        titleEl.classList.remove("typing");
       }
-    }, 32);
+    }, 45);
   }
 
   function computeMood(votes) {
@@ -518,7 +518,7 @@ if (isHost) {
       if (v > top) { top = v; topIds = [d.id]; }
       else if (v === top && v > 0) topIds.push(d.id);
     }
-    if (total === 0) return MOOD_WAITING;
+    if (total === 0) return MOOD_DEFAULT;
     if (topIds.length > 1) return MOOD_TIE;
     return DUCKS.find(d => d.id === topIds[0]).mood;
   }
