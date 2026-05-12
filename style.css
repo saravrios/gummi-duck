@@ -450,15 +450,16 @@ body::before {
 }
 
 .ghost-btn {
-  margin-top: 10px;
+  margin-top: 12px;
   font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
+  font-size: 14px;
   text-transform: lowercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   background: var(--gold-4);
   color: var(--ink);
   border: 0;
-  padding: 6px 10px;
+  padding: 14px 22px;
+  width: 100%;
   cursor: pointer;
   box-shadow:
     0 -2px 0 0 var(--ink),

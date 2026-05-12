@@ -19,10 +19,12 @@ const DUCKS = [
 const MOOD_DEFAULT = "Which Gummi Duck Are You?";
 const MOOD_TIE     = "the vibe today: the team is split. messy.";
 
-// Default URL = host (the public presentation page with QR + pond).
-// Phones land on the voter grid via ?vote (encoded into the QR).
+// Default URL = host on desktop (QR + pond), voter on mobile (3x3 grid).
+// Phones land on the voter grid via ?vote (encoded in the QR) — but if someone
+// opens the bare URL on a phone, also default to voter so they don't see the QR.
 const params  = new URLSearchParams(location.search);
-const isVoter = params.has("vote");
+const isMobile = window.matchMedia("(max-width: 760px)").matches;
+const isVoter = params.has("vote") || (isMobile && !params.has("host"));
 const isHost  = !isVoter;
 
 document.getElementById("voter").hidden = !isVoter;
