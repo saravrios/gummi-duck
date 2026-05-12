@@ -6,16 +6,18 @@
    =========================================================================== */
 
 const DUCKS = [
-  { id: 1, name: "the main character" },
-  { id: 2, name: "the 'i'm fine' duck" },
-  { id: 3, name: "the 3pm slump" },
-  { id: 4, name: "the leaner" },
-  { id: 5, name: "the full collapse" },
-  { id: 6, name: "the horizontal specialist" },
-  { id: 7, name: "the faceplanter" },
-  { id: 8, name: "the round unit" },
-  { id: 9, name: "the submariner" },
+  { id: 1, name: "the main character",      mood: "the vibe today: everyone's the main character ✨" },
+  { id: 2, name: "the 'i'm fine' duck",     mood: "the vibe today: we are absolutely not fine" },
+  { id: 3, name: "the 3pm slump",           mood: "the vibe today: the snack drawer is calling" },
+  { id: 4, name: "the leaner",              mood: "the vibe today: we're leaning into the chaos" },
+  { id: 5, name: "the full collapse",       mood: "the vibe today: full collapse. try again tomorrow." },
+  { id: 6, name: "the horizontal specialist", mood: "the vibe today: lying down IS the strategy" },
+  { id: 7, name: "the faceplanter",         mood: "the vibe today: facedown. no thoughts." },
+  { id: 8, name: "the round unit",          mood: "the vibe today: peak physical performance" },
+  { id: 9, name: "the submariner",          mood: "the vibe today: everyone's logged off mentally" },
 ];
+const MOOD_WAITING = "> scan to vote · ducks grow with every tap";
+const MOOD_TIE     = "the vibe today: the team is split. messy.";
 
 // Default URL = host (the public presentation page with QR + pond).
 // Phones land on the voter grid via ?vote (encoded into the QR).
@@ -190,8 +192,8 @@ if (isHost) {
     }
     new QRCode(host, {
       text: voterUrl,
-      width: 140,
-      height: 140,
+      width: 200,
+      height: 200,
       colorDark:  "#3D2A14",
       colorLight: "#FFF6D6",
       correctLevel: QRCode.CorrectLevel.M,
@@ -327,9 +329,9 @@ if (isHost) {
   rebuildWalls();
 
   // create one bubble per duck with a starting min radius
-  // tuned for small groups (~6-7 voters): each vote noticeably bumps radius
-  const MIN_R = 22;
-  const GROWTH = 26;        // r = MIN_R + GROWTH * votes
+  // tuned for small groups (~6-7 voters) so the winner is obvious
+  const MIN_R = 24;
+  const GROWTH = 34;        // r = MIN_R + GROWTH * votes^1.15
   const bubbles = {};
   DUCKS.forEach((d, i) => {
     const angle = (i / DUCKS.length) * Math.PI * 2;
@@ -488,17 +490,51 @@ if (isHost) {
     rebuildWalls();
   });
 
+  // typewriter for the mood subtitle
+  const subEl = document.querySelector("#host .host-hdr .sub");
+  let typeTimer = null, currentMood = MOOD_WAITING;
+  subEl.textContent = currentMood;
+  function setMood(text) {
+    if (text === currentMood) return;
+    currentMood = text;
+    clearInterval(typeTimer);
+    subEl.classList.add("typing");
+    subEl.textContent = "";
+    let i = 0;
+    typeTimer = setInterval(() => {
+      subEl.textContent = text.slice(0, ++i);
+      if (i >= text.length) {
+        clearInterval(typeTimer);
+        subEl.classList.remove("typing");
+      }
+    }, 32);
+  }
+
+  function computeMood(votes) {
+    let total = 0, top = 0, topIds = [];
+    for (const d of DUCKS) {
+      const v = votes[d.id] || 0;
+      total += v;
+      if (v > top) { top = v; topIds = [d.id]; }
+      else if (v === top && v > 0) topIds.push(d.id);
+    }
+    if (total === 0) return MOOD_WAITING;
+    if (topIds.length > 1) return MOOD_TIE;
+    return DUCKS.find(d => d.id === topIds[0]).mood;
+  }
+
   // listen for vote changes
   sync.onVotes(votes => {
+    setMood(computeMood(votes));
     DUCKS.forEach(d => {
       const v = votes[d.id] || 0;
       const b = bubbles[d.id];
       if (!b) return;
       const prev = b.votes ?? 0;
       b.votes = v;
-      // dramatic linear growth (each vote adds GROWTH px to radius), capped at ~30% of pond
-      const maxR = Math.min(dims.w, dims.h) * 0.30;
-      const r = Math.min(maxR, MIN_R + GROWTH * v);
+      // gently super-linear growth so the leader visibly dominates
+      const maxR = Math.min(dims.w, dims.h) * 0.40;
+      const r = Math.min(maxR, MIN_R + GROWTH * Math.pow(v, 1.15));
       b.targetR = r;
       // little bounce when a new vote lands
       if (v > prev) {

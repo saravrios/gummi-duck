@@ -214,7 +214,16 @@ body::before {
   color: var(--ink-2);
   margin: 0;
   letter-spacing: 1px;
+  min-height: 1.25em;     /* prevent layout jitter while typing */
 }
+.sub.typing::after {
+  content: "_";
+  display: inline-block;
+  animation: caret 0.7s steps(2) infinite;
+  color: var(--ink);
+  margin-left: 2px;
+}
+@keyframes caret { 50% { opacity: 0; } }
 
 /* ===== participant grid ===== */
 .grid {
@@ -396,6 +405,7 @@ body::before {
   position: relative;
   z-index: 5;
 }
+#host.view .stage { grid-template-columns: 1fr 280px; }
 .side-panel, .side-panel * { pointer-events: auto; }
 
 .qr-card {
@@ -410,7 +420,7 @@ body::before {
     6px 6px 0 0 var(--shadow);
 }
 .qr-card #qr canvas, .qr-card #qr img {
-  width: 140px !important; height: 140px !important;
+  width: 200px !important; height: 200px !important;
   display: block;
   margin: 0 auto;
   image-rendering: pixelated;
