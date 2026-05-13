@@ -23,8 +23,10 @@ const MOOD_TIE     = "the vibe today: the team is split. messy.";
 // Phones land on the voter grid via ?vote (encoded in the QR) — but if someone
 // opens the bare URL on a phone, also default to voter so they don't see the QR.
 const params  = new URLSearchParams(location.search);
-const isMobile = window.matchMedia("(max-width: 760px)").matches;
-const isVoter = params.has("vote") || (isMobile && !params.has("host"));
+const isPhone =
+  window.matchMedia("(max-width: 900px)").matches ||
+  /iPhone|iPod|Android.*Mobile|Mobile.*Android|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+const isVoter = params.has("vote") || (isPhone && !params.has("host"));
 const isHost  = !isVoter;
 
 document.getElementById("voter").hidden = !isVoter;

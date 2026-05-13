@@ -544,6 +544,9 @@ body::before {
   .legend { flex: 1 1 220px; }
   #pond { height: 56vh; min-height: 0; }
   .host-hdr h1 { font-size: clamp(32px, 8vw, 56px); }
+  /* belt-and-suspenders: if host view ever appears on phones, hide the QR + legend */
+  #host .qr-card,
+  #host .legend { display: none !important; }
 }
 @media (max-width: 520px) {
   .side-panel { flex-direction: column; }
